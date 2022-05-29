@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
+import { createRequire } from 'module';
 import sade from 'sade';
-import { readPackageUp } from 'readpkg-lit';
 import { prog } from './index.js';
 
 async function run(argv) {
-	const { packageJson } = await readPackageUp();
+	const require = createRequire(import.meta.url);
+	const packageJson = require('../package.json');
 
 	// NOTE(joel): Avoid `MaxListenersExceededWarnings`.
 	process.stdout.setMaxListeners(0);
