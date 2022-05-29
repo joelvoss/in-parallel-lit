@@ -35,26 +35,26 @@ describe('prog', () => {
 		const cmd1Times = 5;
 		const cmd1 = `node ${cmdPath} repeat-${cmd1Times} cmd1`;
 		const cmd2Times = 2;
-		const cmd2 = `node ${cmdPath} repeat-${cmd2Times} cmd2`;
+		const cmd2 = `node ${cmdPath} repeat-${cmd2Times} cmd2 delay`;
 
 		const opts = { _: [cmd1, cmd2] };
 		const res = await prog(opts, process);
 
 		expect(res).toEqual([
-			{ code: 0, name: `node ${cmdPath} repeat-5 cmd1` },
-			{ code: 0, name: `node ${cmdPath} repeat-2 cmd2` },
+			{ code: 0, name: cmd1 },
+			{ code: 0, name: cmd2 },
 		]);
 
 		expect(processSpy).toHaveBeenCalledTimes(cmd1Times + cmd2Times);
 		const stdout = getStdoutMockCalls(processSpy.mock.calls);
 		expect(stdout).toEqual([
-			`[node ${cmdPath} repeat-5 cmd1] cmd1 - repeat 0 times\n`,
-			`[node ${cmdPath} repeat-2 cmd2] cmd2 - repeat 0 times\n`,
-			`[node ${cmdPath} repeat-5 cmd1] cmd1 - repeat 1 times\n`,
-			`[node ${cmdPath} repeat-2 cmd2] cmd2 - repeat 1 times\n`,
-			`[node ${cmdPath} repeat-5 cmd1] cmd1 - repeat 2 times\n`,
-			`[node ${cmdPath} repeat-5 cmd1] cmd1 - repeat 3 times\n`,
-			`[node ${cmdPath} repeat-5 cmd1] cmd1 - repeat 4 times\n`,
+			`[${cmd1}] cmd1 - repeat 0 times\n`,
+			`[${cmd2}] cmd2 - repeat 0 times\n`,
+			`[${cmd1}] cmd1 - repeat 1 times\n`,
+			`[${cmd2}] cmd2 - repeat 1 times\n`,
+			`[${cmd1}] cmd1 - repeat 2 times\n`,
+			`[${cmd1}] cmd1 - repeat 3 times\n`,
+			`[${cmd1}] cmd1 - repeat 4 times\n`,
 		]);
 
 		processSpy.mockRestore();
@@ -67,22 +67,22 @@ describe('prog', () => {
 		const cmd1Times = 5;
 		const cmd1 = `node ${cmdPath} repeat-${cmd1Times} cmd1`;
 		const cmd2Times = 2;
-		const cmd2 = `node ${cmdPath} error-${cmd2Times} cmd2`;
+		const cmd2 = `node ${cmdPath} error-${cmd2Times} cmd2 delay`;
 
-		const opts = { _: [cmd1, cmd2] };
 		try {
+			const opts = { _: [cmd1, cmd2] };
 			await prog(opts, process);
 		} catch (err) {
-			expect(err.message).toBe(`"node ${cmdPath} error-2 cmd2" exited with 1.`);
+			expect(err.message).toBe(`"${cmd2}" exited with 1.`);
 		}
 
 		expect(processSpy).toHaveBeenCalledTimes(cmd2Times * 2);
 		const stdout = getStdoutMockCalls(processSpy.mock.calls);
 		expect(stdout).toEqual([
-			`[node ${cmdPath} repeat-5 cmd1] cmd1 - repeat 0 times\n`,
-			`[node ${cmdPath} error-2 cmd2] cmd2 - repeat 0 times\n`,
-			`[node ${cmdPath} repeat-5 cmd1] cmd1 - repeat 1 times\n`,
-			`[node ${cmdPath} error-2 cmd2] cmd2 - error\n`,
+			`[${cmd1}] cmd1 - repeat 0 times\n`,
+			`[${cmd2}] cmd2 - repeat 0 times\n`,
+			`[${cmd1}] cmd1 - repeat 1 times\n`,
+			`[${cmd2}] cmd2 - error\n`,
 		]);
 
 		processSpy.mockRestore();
@@ -101,24 +101,24 @@ describe('prog', () => {
 			const cmd1Times = 2;
 			const cmd1 = `node ${cmdPath} repeat-${cmd1Times} cmd1`;
 			const cmd2Times = 2;
-			const cmd2 = `node ${cmdPath} repeat-${cmd2Times} cmd2`;
+			const cmd2 = `node ${cmdPath} repeat-${cmd2Times} cmd2 delay`;
 
 			const opts = { _: [cmd1, cmd2], 'aggregate-output': true };
 			const res = await prog(opts, process);
 
 			expect(res).toEqual([
-				{ code: 0, name: `node ${cmdPath} repeat-2 cmd1` },
-				{ code: 0, name: `node ${cmdPath} repeat-2 cmd2` },
+				{ code: 0, name: cmd1 },
+				{ code: 0, name: cmd2 },
 			]);
 
 			// NOTE(joel): One stdout for each command.
 			expect(processSpy).toHaveBeenCalledTimes(2);
 			const stdout = getStdoutMockCalls(processSpy.mock.calls);
 			expect(stdout).toEqual([
-				`[node ${cmdPath} repeat-2 cmd1] cmd1 - repeat 0 times\n` +
-					`[node ${cmdPath} repeat-2 cmd1] cmd1 - repeat 1 times\n`,
-				`[node ${cmdPath} repeat-2 cmd2] cmd2 - repeat 0 times\n` +
-					`[node ${cmdPath} repeat-2 cmd2] cmd2 - repeat 1 times\n`,
+				`[${cmd1}] cmd1 - repeat 0 times\n` +
+					`[${cmd1}] cmd1 - repeat 1 times\n`,
+				`[${cmd2}] cmd2 - repeat 0 times\n` +
+					`[${cmd2}] cmd2 - repeat 1 times\n`,
 			]);
 
 			processSpy.mockRestore();
@@ -136,14 +136,14 @@ describe('prog', () => {
 			const cmd1Times = 2;
 			const cmd1 = `node ${cmdPath} repeat-${cmd1Times} cmd1`;
 			const cmd2Times = 2;
-			const cmd2 = `node ${cmdPath} repeat-${cmd2Times} cmd2`;
+			const cmd2 = `node ${cmdPath} repeat-${cmd2Times} cmd2 delay`;
 
 			const opts = { _: [cmd1, cmd2], 'max-parallel': 1 };
 			const res = await prog(opts, process);
 
 			expect(res).toEqual([
-				{ code: 0, name: `node ${cmdPath} repeat-2 cmd1` },
-				{ code: 0, name: `node ${cmdPath} repeat-2 cmd2` },
+				{ code: 0, name: cmd1 },
+				{ code: 0, name: cmd2 },
 			]);
 
 			// NOTE(joel): Output as "default" but the sorting is different.
@@ -151,10 +151,10 @@ describe('prog', () => {
 
 			const stdout = getStdoutMockCalls(processSpy.mock.calls);
 			expect(stdout).toEqual([
-				`[node ${cmdPath} repeat-2 cmd1] cmd1 - repeat 0 times\n`,
-				`[node ${cmdPath} repeat-2 cmd1] cmd1 - repeat 1 times\n`,
-				`[node ${cmdPath} repeat-2 cmd2] cmd2 - repeat 0 times\n`,
-				`[node ${cmdPath} repeat-2 cmd2] cmd2 - repeat 1 times\n`,
+				`[${cmd1}] cmd1 - repeat 0 times\n`,
+				`[${cmd1}] cmd1 - repeat 1 times\n`,
+				`[${cmd2}] cmd2 - repeat 0 times\n`,
+				`[${cmd2}] cmd2 - repeat 1 times\n`,
 			]);
 
 			processSpy.mockRestore();
@@ -172,28 +172,25 @@ describe('prog', () => {
 			const cmd1Times = 5;
 			const cmd1 = `node ${cmdPath} repeat-${cmd1Times} cmd1`;
 			const cmd2Times = 2;
-			const cmd2 = `node ${cmdPath} error-${cmd2Times} cmd2`;
-
-			const opts = { _: [cmd1, cmd2], 'continue-on-error': true };
+			const cmd2 = `node ${cmdPath} error-${cmd2Times} cmd2 delay`;
 
 			try {
+				const opts = { _: [cmd1, cmd2], 'continue-on-error': true };
 				await prog(opts, process);
 			} catch (err) {
-				expect(err.message).toBe(
-					`"node ${cmdPath} error-2 cmd2" exited with 1.`,
-				);
+				expect(err.message).toBe(`"${cmd2}" exited with 1.`);
 			}
 
 			expect(processSpy).toHaveBeenCalledTimes(cmd1Times + cmd2Times);
 			const stdout = getStdoutMockCalls(processSpy.mock.calls);
 			expect(stdout).toEqual([
-				`[node ${cmdPath} repeat-5 cmd1] cmd1 - repeat 0 times\n`,
-				`[node ${cmdPath} error-2 cmd2] cmd2 - repeat 0 times\n`,
-				`[node ${cmdPath} repeat-5 cmd1] cmd1 - repeat 1 times\n`,
-				`[node ${cmdPath} error-2 cmd2] cmd2 - error\n`,
-				`[node ${cmdPath} repeat-5 cmd1] cmd1 - repeat 2 times\n`,
-				`[node ${cmdPath} repeat-5 cmd1] cmd1 - repeat 3 times\n`,
-				`[node ${cmdPath} repeat-5 cmd1] cmd1 - repeat 4 times\n`,
+				`[${cmd1}] cmd1 - repeat 0 times\n`,
+				`[${cmd2}] cmd2 - repeat 0 times\n`,
+				`[${cmd1}] cmd1 - repeat 1 times\n`,
+				`[${cmd2}] cmd2 - error\n`,
+				`[${cmd1}] cmd1 - repeat 2 times\n`,
+				`[${cmd1}] cmd1 - repeat 3 times\n`,
+				`[${cmd1}] cmd1 - repeat 4 times\n`,
 			]);
 
 			processSpy.mockRestore();
