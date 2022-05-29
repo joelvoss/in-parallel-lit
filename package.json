@@ -18,8 +18,7 @@
   ],
   "scripts": {
     "start": "./Taskfile.sh start",
-    "test": "./Taskfile.sh test",
-    "prepublishOnly": "./Taskfile.sh build"
+    "test": "./Taskfile.sh test"
   },
   "dependencies": {
     "cross-spawn": "^7.0.3",
@@ -35,10 +34,7 @@
     "dist/"
   ],
   "eslintConfig": {
-    "extends": "@jvdx/eslint-config",
-    "rules": {
-      "no-duplicate-imports": 0
-    }
+    "extends": "@jvdx/eslint-config"
   },
   "eslintIgnore": [
     "tests/",
