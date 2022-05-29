@@ -3,7 +3,13 @@ import path from 'node:path';
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function getMockCalls(calls) {
+/**
+ * getMockCalls normalizes all `processSpy.mock.calls` and removes any
+ * ANSI color codes, since we're not interested in those here.
+ * See `select-color.test.js` as well as `wrap-stream-with-label.test.js` for
+ * unit tests that should assert ANSI color codes.
+ */
+function getStdoutMockCalls(calls) {
 	return calls.map(call => {
 		const str = call[0].toString();
 		return str.replace(
@@ -36,7 +42,7 @@ describe('prog', () => {
 		]);
 
 		expect(processSpy).toHaveBeenCalledTimes(cmd1Times + cmd2Times);
-		const stdout = getMockCalls(processSpy.mock.calls);
+		const stdout = getStdoutMockCalls(processSpy.mock.calls);
 		expect(stdout).toEqual([
 			`[node ${cmdPath} repeat-5 cmd1] cmd1 - repeat 0 times\n`,
 			`[node ${cmdPath} repeat-2 cmd2] cmd2 - repeat 0 times\n`,
@@ -67,7 +73,7 @@ describe('prog', () => {
 		}
 
 		expect(processSpy).toHaveBeenCalledTimes(cmd2Times * 2);
-		const stdout = getMockCalls(processSpy.mock.calls);
+		const stdout = getStdoutMockCalls(processSpy.mock.calls);
 		expect(stdout).toEqual([
 			`[node ${cmdPath} repeat-5 cmd1] cmd1 - repeat 0 times\n`,
 			`[node ${cmdPath} error-2 cmd2] cmd2 - repeat 0 times\n`,
@@ -103,7 +109,7 @@ describe('prog', () => {
 
 			// NOTE(joel): One stdout for each command.
 			expect(processSpy).toHaveBeenCalledTimes(2);
-			const stdout = getMockCalls(processSpy.mock.calls);
+			const stdout = getStdoutMockCalls(processSpy.mock.calls);
 			expect(stdout).toEqual([
 				`[node ${cmdPath} repeat-2 cmd1] cmd1 - repeat 0 times\n` +
 					`[node ${cmdPath} repeat-2 cmd1] cmd1 - repeat 1 times\n`,
@@ -139,7 +145,7 @@ describe('prog', () => {
 			// NOTE(joel): Output as "default" but the sorting is different.
 			expect(processSpy).toHaveBeenCalledTimes(cmd1Times + cmd2Times);
 
-			const stdout = getMockCalls(processSpy.mock.calls);
+			const stdout = getStdoutMockCalls(processSpy.mock.calls);
 			expect(stdout).toEqual([
 				`[node ${cmdPath} repeat-2 cmd1] cmd1 - repeat 0 times\n`,
 				`[node ${cmdPath} repeat-2 cmd1] cmd1 - repeat 1 times\n`,
@@ -175,7 +181,7 @@ describe('prog', () => {
 			}
 
 			expect(processSpy).toHaveBeenCalledTimes(cmd1Times + cmd2Times);
-			const stdout = getMockCalls(processSpy.mock.calls);
+			const stdout = getStdoutMockCalls(processSpy.mock.calls);
 			expect(stdout).toEqual([
 				`[node ${cmdPath} repeat-5 cmd1] cmd1 - repeat 0 times\n`,
 				`[node ${cmdPath} error-2 cmd2] cmd2 - repeat 0 times\n`,
