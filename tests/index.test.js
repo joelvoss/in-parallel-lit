@@ -24,6 +24,10 @@ function getStdoutMockCalls(calls) {
 describe('prog', () => {
 	jest.setTimeout(10000);
 
+	beforeEach(() => {
+		jest.restoreAllMocks();
+	});
+
 	test('default', async () => {
 		const processSpy = jest.spyOn(process.stdout, 'write').mockImplementation();
 		const cmdPath = path.resolve(__dirname, '../tests/__fixture__/mock-cmd.js');
