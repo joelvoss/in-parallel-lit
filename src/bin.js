@@ -20,7 +20,7 @@ async function run(argv) {
 			`-n, --names`,
 			`List of custom names to be used in prefix template.`,
 		)
-		.example(`-n first,second "ping google.com" "ping 172.0.0.1"`)
+		.example(`-n "first,second" "ping google.com" "ping 172.0.0.1"`)
 		.option(
 			`-c, --continue-on-error`,
 			`Set the flag to continue executing other/subsequent tasks even if a task threw an error. 'in-parallel' itself will exit with non-zero code if one or more tasks threw error(s).`,
