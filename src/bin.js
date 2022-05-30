@@ -17,16 +17,21 @@ async function run(argv) {
 		.version(packageJson.version)
 		.describe(packageJson.description)
 		.option(
-			'-c, --continue-on-error',
+			`-n, --names`,
+			`List of custom names to be used in prefix template.`,
+		)
+		.example(`-n first,second "ping google.com" "ping 172.0.0.1"`)
+		.option(
+			`-c, --continue-on-error`,
 			`Set the flag to continue executing other/subsequent tasks even if a task threw an error. 'in-parallel' itself will exit with non-zero code if one or more tasks threw error(s).`,
 		)
 		.option(
-			'--max-parallel',
+			`--max-parallel`,
 			`Set the maximum number of parallelism. Default is unlimited.`,
 			0,
 		)
 		.option(
-			'--aggregate-output',
+			`--aggregate-output`,
 			`Avoid interleaving output by delaying printing of each command's output until it has finished.`,
 			false,
 		)

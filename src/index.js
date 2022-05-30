@@ -15,6 +15,9 @@ import { getStreamKind } from './lib/get-stream-kind.js';
 export function prog(opts, proc) {
 	const { _: tasks, ...options } = opts;
 
+	const customTaskNames =
+		options.names != null ? options.names.split(',').map(n => n.trim()) : [];
+
 	return new Promise((resolve, reject) => {
 		let results = [];
 		let queue = [];
@@ -56,20 +59,22 @@ export function prog(opts, proc) {
 				return;
 			}
 
+			const task = queue.shift();
+
 			const originalOutputStream = proc.stdout;
 			const optionsClone = {
-				...Object.assign({}, options),
 				stdout: proc.stdout,
 				stderr: proc.stderr,
 				stdin: proc.stdin,
+				customName: customTaskNames[task.index],
 			};
+
 			const writer = new MemoryWritable();
 
 			if (options['aggregate-output']) {
 				optionsClone.stdout = writer;
 			}
 
-			const task = queue.shift();
 			const promise = runTask(task.name, optionsClone);
 
 			promises.push(promise);
@@ -137,6 +142,7 @@ export function prog(opts, proc) {
  * @prop {stream.Readable} stdin
  * @prop {stream.Writable} stdout
  * @prop {stream.Writable} stderr
+ * @prop {string} [customName=]
  */
 
 /**
@@ -150,8 +156,8 @@ function runTask(name, opts) {
 
 	const task = new Promise((resolve, reject) => {
 		const stdin = opts.stdin;
-		const stdout = wrapStreamWithLabel(opts.stdout, name);
-		const stderr = wrapStreamWithLabel(opts.stderr, name);
+		const stdout = wrapStreamWithLabel(opts.stdout, opts.customName || name);
+		const stderr = wrapStreamWithLabel(opts.stderr, opts.customName || name);
 
 		const stdinKind = getStreamKind(stdin, process.stdin);
 		const stdoutKind = getStreamKind(stdout, process.stdout);

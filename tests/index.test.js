@@ -26,6 +26,9 @@ describe('prog', () => {
 
 	beforeEach(() => {
 		jest.restoreAllMocks();
+		process.stdout.setMaxListeners(0);
+		process.stderr.setMaxListeners(0);
+		process.stdin.setMaxListeners(0);
 	});
 
 	test('default', async () => {
@@ -191,6 +194,40 @@ describe('prog', () => {
 				`[${cmd1}] cmd1 - repeat 2 times\n`,
 				`[${cmd1}] cmd1 - repeat 3 times\n`,
 				`[${cmd1}] cmd1 - repeat 4 times\n`,
+			]);
+
+			processSpy.mockRestore();
+		});
+
+		test('names', async () => {
+			const processSpy = jest
+				.spyOn(process.stdout, 'write')
+				.mockImplementation();
+			const cmdPath = path.resolve(
+				__dirname,
+				'../tests/__fixture__/mock-cmd.js',
+			);
+
+			const cmd1Times = 2;
+			const cmd1 = `node ${cmdPath} repeat-${cmd1Times} cmd1`;
+			const cmd2Times = 2;
+			const cmd2 = `node ${cmdPath} repeat-${cmd2Times} cmd2 delay`;
+
+			const opts = { _: [cmd1, cmd2], names: 'first,second' };
+			const res = await prog(opts, process);
+
+			expect(res).toEqual([
+				{ code: 0, name: cmd1 },
+				{ code: 0, name: cmd2 },
+			]);
+
+			expect(processSpy).toHaveBeenCalledTimes(cmd1Times + cmd2Times);
+			const stdout = getStdoutMockCalls(processSpy.mock.calls);
+			expect(stdout).toEqual([
+				`[first] cmd1 - repeat 0 times\n`,
+				`[second] cmd2 - repeat 0 times\n`,
+				`[first] cmd1 - repeat 1 times\n`,
+				`[second] cmd2 - repeat 1 times\n`,
 			]);
 
 			processSpy.mockRestore();
