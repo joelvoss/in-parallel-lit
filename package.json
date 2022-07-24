@@ -34,7 +34,7 @@
     "sade": "^1.8.1"
   },
   "devDependencies": {
-    "@jvdx/core": "^2.17.0"
+    "@jvdx/core": "^2.18.0"
   },
   "prettier": "@jvdx/prettier-config",
   "prettierIgnore": [
