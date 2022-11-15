@@ -15,9 +15,9 @@ describe(`wrapStreamWithLabel`, () => {
 		target.on('data', chunk => chunks.push(chunk));
 		target.on('end', () => {
 			expect(chunks).toMatchInlineSnapshot(`
-			Array [
-			  Object {
-			    "data": Array [
+			[
+			  {
+			    "data": [
 			      91,
 			      119,
 			      114,
@@ -69,9 +69,9 @@ describe(`wrapStreamWithLabel`, () => {
 		target.on('data', chunk => chunks.push(chunk));
 		target.on('end', () => {
 			expect(chunks).toMatchInlineSnapshot(`
-			Array [
-			  Object {
-			    "data": Array [
+			[
+			  {
+			    "data": [
 			      27,
 			      91,
 			      51,

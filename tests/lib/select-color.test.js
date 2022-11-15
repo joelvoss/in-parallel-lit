@@ -7,8 +7,8 @@ describe(`selectColor`, () => {
 		const color3 = selectColor('first-task');
 
 		expect(Buffer.from(color1(`test`))).toMatchInlineSnapshot(`
-		Object {
-		  "data": Array [
+		{
+		  "data": [
 		    27,
 		    91,
 		    51,
@@ -28,8 +28,8 @@ describe(`selectColor`, () => {
 		}
 	`);
 		expect(Buffer.from(color2(`test`))).toMatchInlineSnapshot(`
-		Object {
-		  "data": Array [
+		{
+		  "data": [
 		    27,
 		    91,
 		    51,
