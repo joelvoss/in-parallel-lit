@@ -19,7 +19,7 @@ lint() {
 }
 
 test() {
-  jvdx test --testPathPattern=/tests $*
+  FORCE_COLOR=1 jvdx test --testPathPattern=/tests $*
 }
 
 validate() {
