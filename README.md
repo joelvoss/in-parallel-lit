@@ -2,10 +2,6 @@
 
 A CLI tool to run multiple processes in parallel.
 
-## Requirements
-
-- [Node v16+][install-node]
-
 ## Installation
 
 ```bash

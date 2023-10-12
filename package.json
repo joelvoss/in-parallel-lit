@@ -14,7 +14,7 @@
   },
   "type": "module",
   "engines": {
-    "node": ">= 14"
+    "node": ">=18"
   },
   "main": "src/index.js",
   "bin": {
@@ -34,7 +34,7 @@
     "sade": "^1.8.1"
   },
   "devDependencies": {
-    "@jvdx/core": "^3.5.0"
+    "@jvdx/core": "^3.6.0"
   },
   "prettier": "@jvdx/prettier-config",
   "prettierIgnore": [
