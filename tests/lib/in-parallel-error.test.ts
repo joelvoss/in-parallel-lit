@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest';
 import { InParallelError } from '../../src/lib/in-parallel-error';
 
 describe(`InParallelError`, () => {

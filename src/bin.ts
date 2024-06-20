@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-import { createRequire } from 'module';
+import { createRequire } from 'node:module';
 import sade from 'sade';
-import { prog } from './index.js';
+import { prog } from './index';
 
-async function run(argv) {
+async function run(argv: string[]) {
 	const require = createRequire(import.meta.url);
 	const packageJson = require('../package.json');
 

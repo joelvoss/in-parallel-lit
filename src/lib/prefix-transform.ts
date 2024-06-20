@@ -1,21 +1,25 @@
-import { Transform } from 'node:stream';
+import { Transform, type TransformCallback } from 'node:stream';
 
 const ALL_BR = /\n/g;
 
 export class PrefixTransform extends Transform {
-	constructor(prefix) {
+	prefix: string;
+	lastPrefix: string | null;
+	lastIsLinebreak: boolean;
+
+	constructor(prefix: string) {
 		super();
 		this.prefix = prefix;
 		this.lastPrefix = null;
 		this.lastIsLinebreak = true;
 	}
 
-	_transform(chunk, _enc, cb) {
+	_transform(chunk: unknown, _enc: BufferEncoding, cb: TransformCallback) {
 		const firstPrefix = this.lastIsLinebreak
 			? this.prefix
 			: this.lastPrefix !== this.prefix
-			? '\n'
-			: '';
+				? '\n'
+				: '';
 		const prefixed = `${firstPrefix}${chunk}`.replace(
 			ALL_BR,
 			`\n${this.prefix}`,

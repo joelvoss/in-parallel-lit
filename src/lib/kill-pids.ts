@@ -1,19 +1,26 @@
-import os from 'os';
-import crossSpawn from 'cross-spawn';
+import os from 'node:os';
+import { spawn } from 'cross-spawn';
+import type { SpawnOptions } from 'node:child_process';
 
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Wrap crossSpawn in a Promise.
- * @param {string} cmd
- * @param {Array<string|number>} args
- * @param {any} options
+ * Wrap crossSpawn in a Promise
  */
-function crossSpawnPromise(cmd, args, options) {
+function crossSpawnPromise(
+	cmd: string,
+	args: readonly string[] = [],
+	options: SpawnOptions = {},
+): Promise<string> {
 	return new Promise((resolve, reject) => {
 		let stdout = '';
 		let stderr = '';
-		const ch = crossSpawn(cmd, args, options);
+
+		const ch = spawn(cmd, args, options);
+
+		if (ch.stdout === null || ch.stderr === null) {
+			return reject('stdout/stderr is null');
+		}
 
 		ch.stdout.on('data', d => {
 			stdout += d.toString();
@@ -37,11 +44,10 @@ function crossSpawnPromise(cmd, args, options) {
 
 /**
  * Kills a process by ID and all its subprocesses.
- * @param {number} pid
  */
-export async function killPids(pid, platform = process.platform) {
+export async function killPids(pid: number, platform = process.platform) {
 	if (platform === 'win32') {
-		crossSpawn('taskkill', ['/F', '/T', '/PID', pid]);
+		spawn('taskkill', ['/F', '/T', '/PID', String(pid)]);
 		return;
 	}
 
@@ -53,31 +59,31 @@ export async function killPids(pid, platform = process.platform) {
 		//      1   727
 		//      1  7166
 		let stdout = await crossSpawnPromise('ps', ['-A', '-o', 'ppid,pid']);
-		stdout = stdout.split(os.EOL);
+		let stdoutRows = stdout.split(os.EOL);
 
 		let pidExists = false;
-		const pidTree = {};
-		for (let i = 1; i < stdout.length; i++) {
-			stdout[i] = stdout[i].trim();
-			if (!stdout[i]) continue;
+		const pidTree: Record<number, number[]> = {};
+		for (let i = 1; i < stdoutRows.length; i++) {
+			stdoutRows[i] = stdoutRows[i].trim();
+			if (!stdoutRows[i]) continue;
 
-			stdout[i] = stdout[i].split(/\s+/);
-			stdout[i][0] = parseInt(stdout[i][0], 10); // PPID
-			stdout[i][1] = parseInt(stdout[i][1], 10); // PID
+			let stdoutTuple = stdoutRows[i].split(/\s+/);
+			let stdoutPpid = parseInt(stdoutTuple[0], 10);
+			let stdoutPid = parseInt(stdoutTuple[1], 10);
 
 			// NOTE(joel): Make sure our pid is part of the `ps` output.
 			if (
-				(!pidExists && stdout[i][1] === pid) ||
-				(!pidExists && stdout[i][0] === pid)
+				(!pidExists && stdoutPid === pid) ||
+				(!pidExists && stdoutPpid === pid)
 			) {
 				pidExists = true;
 			}
 
 			// NOTE(joel): Build the adiacency Hash Map (pid -> [children of pid])
-			if (pidTree[stdout[i][0]]) {
-				pidTree[stdout[i][0]].push(stdout[i][1]);
+			if (pidTree[stdoutPpid]) {
+				pidTree[stdoutPpid].push(stdoutPid);
 			} else {
-				pidTree[stdout[i][0]] = [stdout[i][1]];
+				pidTree[stdoutPpid] = [stdoutPid];
 			}
 		}
 

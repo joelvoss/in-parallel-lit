@@ -6,8 +6,6 @@ A CLI tool to run multiple processes in parallel.
 
 ```bash
 $ npm i -g in-parallel-lit
-# or
-$ yarn global add in-parallel-lit
 ```
 
 ## Usage
@@ -151,9 +149,3 @@ $ ./Taskfile.sh validate
 
 (3) Start developing. See [`./Taskfile.sh`](./Taskfile.sh) for more tasks to
     help you develop.
-
----
-
-_This project was set up by @jvdx/core_
-
-[install-node]: https://github.com/nvm-sh/nvm

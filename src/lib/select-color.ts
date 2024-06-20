@@ -3,33 +3,40 @@ let NODE_DISABLE_COLORS;
 let NO_COLOR;
 let TERM;
 let isTTY = true;
+let enabled: boolean;
 
-if (typeof process !== 'undefined') {
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Check if color support is enabled.
+ */
+function checkColorSupport() {
+	if (enabled != null) return;
+
 	({ FORCE_COLOR, NODE_DISABLE_COLORS, NO_COLOR, TERM } = process.env);
 	isTTY = process.stdout && process.stdout.isTTY;
-}
 
-const enabled =
-	!NODE_DISABLE_COLORS &&
-	NO_COLOR == null &&
-	TERM !== 'dumb' &&
-	((FORCE_COLOR != null && FORCE_COLOR !== '0') || isTTY);
+	enabled =
+		!NODE_DISABLE_COLORS &&
+		NO_COLOR == null &&
+		TERM !== 'dumb' &&
+		((FORCE_COLOR != null && FORCE_COLOR !== '0') || isTTY);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Returns functions that wrap a given string with color char codes.
- * @param {number} x
- * @param {number} y
- * @returns {(txt: string) => string}
  */
-function createColor(x, y) {
+function createColor(x: number, y: number) {
 	const rgx = new RegExp(`\\x1b\\[${y}m`, 'g');
 	const open = `\x1b[${x}m`;
 	const close = `\x1b[${y}m`;
 
-	return function (txt) {
-		if (!enabled || txt == null) return txt;
+	return function (txt: string) {
+		checkColorSupport();
+
+		if (!enabled) return txt;
 		return (
 			open +
 			(~('' + txt).indexOf(close) ? txt.replace(rgx, close + open) : txt) +
@@ -49,14 +56,12 @@ const colors = [
 ];
 
 let colorIndex = 0;
-const taskNamesToColors = new Map();
+const taskNamesToColors = new Map<string, ReturnType<typeof createColor>>();
 
 /**
  * Select a color from given task name.
- * @param {string} taskName
- * @returns {(txt: string) => string}
  */
-export function selectColor(taskName) {
+export function selectColor(taskName: string) {
 	let color = taskNamesToColors.get(taskName);
 	if (color == null) {
 		color = colors[colorIndex];

@@ -1,22 +1,30 @@
-import crossSpawn from 'cross-spawn';
+import { describe, test, expect, vi } from 'vitest';
 import { EventEmitter } from 'node:events';
 import { Readable } from 'node:stream';
-
 import { spawn } from '../../src/lib/spawn';
 
 ////////////////////////////////////////////////////////////////////////////////
 
-jest.mock('cross-spawn');
+const crossSpawnMock = vi.hoisted(() => {
+	return { spawn: vi.fn() };
+});
+
+vi.mock('cross-spawn', () => {
+	return { spawn: crossSpawnMock.spawn };
+});
 
 ////////////////////////////////////////////////////////////////////////////////
 
 describe(`spawn`, () => {
 	test('default', async () => {
-		let args = [];
-		crossSpawn.mockImplementation((..._args) => {
+		let args: unknown[] = [];
+
+		crossSpawnMock.spawn.mockImplementation((..._args) => {
 			args = _args;
 			const mockChildProcess = new EventEmitter();
+			// @ts-expect-error - mock
 			mockChildProcess.stdout = new Readable();
+			// @ts-expect-error - mock
 			mockChildProcess.stderr = new Readable();
 			return mockChildProcess;
 		});

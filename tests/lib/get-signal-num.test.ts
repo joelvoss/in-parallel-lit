@@ -1,8 +1,10 @@
+import { describe, test, expect } from 'vitest';
 import { getSignalNumber } from '../../src/lib/get-signal-num';
 
 describe(`getSignalNumber`, () => {
 	test('fallback', () => {
-		expect(getSignalNumber()).toBe(0)
+		// @ts-expect-error - Testing fallback
+		expect(getSignalNumber()).toBe(0);
 	});
 
 	test('all signals', () => {

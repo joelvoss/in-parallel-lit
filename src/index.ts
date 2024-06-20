@@ -1,28 +1,46 @@
-import { InParallelError } from './lib/in-parallel-error.js';
-import { spawn } from './lib/spawn.js';
-import { MemoryWritable } from './lib/memory-writable.js';
-import { getSignalNumber } from './lib/get-signal-num.js';
-import { removeFromArr } from './lib/remove-from-arr.js';
-import { wrapStreamWithLabel } from './lib/wrap-stream-with-label.js';
-import { getStreamKind } from './lib/get-stream-kind.js';
+import type { ChildProcess } from 'node:child_process';
+import type { Readable, Writable } from 'node:stream';
+import { getSignalNumber } from './lib/get-signal-num';
+import { getStreamKind } from './lib/get-stream-kind';
+import { InParallelError } from './lib/in-parallel-error';
+import { MemoryWritable } from './lib/memory-writable';
+import { removeFromArr } from './lib/remove-from-arr';
+import { spawn } from './lib/spawn';
+import { wrapStreamWithLabel } from './lib/wrap-stream-with-label';
+
+interface Options {
+	_: string[];
+	// NOTE(joel): Keep in sync with options defined in `src/bin.ts`.
+	names?: string;
+	'aggregate-output'?: boolean;
+	'continue-on-error'?: boolean;
+	'max-parallel'?: number;
+}
+
+interface Result {
+	name: string;
+	code?: number | null;
+}
+
+interface QueueItem {
+	name: string;
+	index: number;
+}
 
 /**
  * prog represents the main program logic.
- * @param {{[key: string]: any, _: string[]}} opts
- * @param {NodeJS.process} proc
- * @returns {Promise<void>}
  */
-export function prog(opts, proc) {
+export function prog(opts: Options, proc: NodeJS.Process) {
 	const { _: tasks, ...options } = opts;
 
 	const customTaskNames =
 		options.names != null ? options.names.split(',').map(n => n.trim()) : [];
 
 	return new Promise((resolve, reject) => {
-		let results = [];
-		let queue = [];
-		let promises = [];
-		let error = null;
+		let results: Result[] = [];
+		let queue: QueueItem[] = [];
+		let promises: Task[] = [];
+		let error: InParallelError | null = null;
 		let aborted = false;
 
 		// NOTE(joel): Resolve if no tasks are passed.
@@ -60,6 +78,8 @@ export function prog(opts, proc) {
 			}
 
 			const task = queue.shift();
+			// NOTE(joel): This should never happen, but just in case.
+			if (task == null) return;
 
 			const originalOutputStream = proc.stdout;
 			const optionsClone = {
@@ -72,7 +92,11 @@ export function prog(opts, proc) {
 			const writer = new MemoryWritable();
 
 			if (options['aggregate-output']) {
-				optionsClone.stdout = writer;
+				// NOTE(joel): Replace the stdout stream with a memory stream.
+				// TypeScript doesn't like this, but it's fine.
+				optionsClone.stdout = writer as unknown as NodeJS.WriteStream & {
+					fd: 1;
+				};
 			}
 
 			const promise = runTask(task.name, optionsClone);
@@ -137,22 +161,28 @@ export function prog(opts, proc) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-/**
- * @typedef {Object} RunTaskOptions
- * @prop {stream.Readable} stdin
- * @prop {stream.Writable} stdout
- * @prop {stream.Writable} stderr
- * @prop {string} [customName=]
- */
+interface RunTaskOptions {
+	stdin: Readable;
+	stdout: Writable;
+	stderr: Writable;
+	customName?: string;
+}
+
+interface TaskResult {
+	name: string;
+	code: number | null;
+	signal: string | null;
+}
+
+interface Task extends Promise<TaskResult> {
+	abort: () => void;
+}
 
 /**
  * runTask executes a single task as a child process.
- * @param {string} name
- * @param {RunTaskOptions} opts
- * @returns {Promise<{name: string, code: number, signal: string}>}
  */
-function runTask(name, opts) {
-	let proc = null;
+function runTask(name: string, opts: RunTaskOptions) {
+	let proc: ChildProcess | null = null;
 
 	const task = new Promise((resolve, reject) => {
 		const stdin = opts.stdin;
@@ -169,15 +199,17 @@ function runTask(name, opts) {
 			stdio: [stdinKind, stdoutKind, stderrKind],
 		});
 
+		if (proc == null) return reject('Failed to spawn process');
+
 		// Piping stdio.
 		if (stdinKind === 'pipe') {
-			stdin.pipe(proc.stdin);
+			stdin.pipe(proc.stdin!);
 		}
 		if (stdoutKind === 'pipe') {
-			proc.stdout.pipe(stdout, { end: false });
+			proc.stdout!.pipe(stdout!, { end: false });
 		}
 		if (stderrKind === 'pipe') {
-			proc.stderr.pipe(stderr, { end: false });
+			proc.stderr!.pipe(stderr!, { end: false });
 		}
 
 		// Register
@@ -191,11 +223,12 @@ function runTask(name, opts) {
 		});
 	});
 
+	// @ts-expect-error - `abort` is not part of the Promise interface.
 	task.abort = () => {
 		if (proc == null) return;
 		proc.kill();
 		proc = null;
 	};
 
-	return task;
+	return task as Task;
 }

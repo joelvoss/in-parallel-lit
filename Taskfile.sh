@@ -6,39 +6,73 @@ PATH=./node_modules/.bin:$PATH
 # //////////////////////////////////////////////////////////////////////////////
 # START tasks
 
-start() {
-  echo "Please run \"node src/bin.js [options]\" in your shell directly."
+start_dev() {
+  echo "Not implemented. Test package via vitest (unit tests)"
+}
+
+build() {
+  echo "Building..."
+  rm -rf dist
+  vite build
 }
 
 format() {
-  jvdx format $*
+  echo "Running prettier..."
+
+  prettier \
+    --write \
+    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md,mdx,yml,yaml,html}" \
+    "tests/**/*.{js,jsx,ts,tsx,json,css,scss,md,mdx,yml,yaml,html}"
+}
+
+typecheck() {
+  echo "Running tsc..."
+  tsc --noEmit
 }
 
 lint() {
-  jvdx lint $*
+  echo "Running eslint..."
+  eslint .
 }
 
 test() {
-  FORCE_COLOR=1 jvdx test --testPathPattern=/tests $*
+  if [ "$1" = "-w" ] || [ "$1" = "--watch" ]; then
+    echo "Running vitest in watch mode..."
+    vitest
+    return
+  else
+    echo "Running vitest..."
+    vitest run
+  fi
 }
 
 validate() {
-  lint $*
-  test $*
+  typecheck
+  lint
+  test
 }
 
 clean() {
-  jvdx clean $*
+  rm -rf node_modules dist
 }
 
-default() {
-  echo "Unknown task."
-  echo "Usage:"
-  echo " $ ./Taskfile.sh start [--flags]"
-  echo ""
+help() {
+  echo "Usage: $0 <command>"
+  echo
+  echo "Commands:"
+  echo "  start_dev   Start development server"
+  echo "  build       Build for production"
+  echo "  format      Format code"
+  echo "  typecheck   Typecheck code"
+  echo "  lint        Lint code"
+  echo "  test        Run tests"
+  echo "  validate    Validate code"
+  echo "  clean       Clean temporary files/directories"
+  echo "  help        Show help"
+  echo
 }
 
 # END tasks
 # //////////////////////////////////////////////////////////////////////////////
 
-${@:-default}
+${@:-help}

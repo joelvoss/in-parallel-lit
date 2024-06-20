@@ -1,4 +1,4 @@
-const signals = {
+const signals: Record<string, number> = {
 	SIGABRT: 6,
 	SIGALRM: 14,
 	SIGBUS: 10,
@@ -24,9 +24,7 @@ const signals = {
 
 /**
  * Converts a signal name to a number.
- * @param {string} signal
- * @returns {number}
  */
-export function getSignalNumber(signal) {
+export function getSignalNumber(signal: string) {
 	return signals[signal] || 0;
 }

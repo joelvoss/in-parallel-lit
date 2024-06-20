@@ -12,21 +12,30 @@
     "type": "git",
     "url": "git+https://github.com/joelvoss/in-parallel-lit.git"
   },
-  "type": "module",
   "engines": {
     "node": ">=18"
   },
-  "main": "src/index.js",
   "bin": {
-    "in-parallel": "src/bin.js"
+    "in-parallel": "dist/bin.js"
   },
+  "type": "module",
   "files": [
-    "src",
-    "LICENSE"
+    "dist",
+    "LICENSE",
+    "README.md"
   ],
+  "source": "./src/bin.ts",
+  "main": "./dist/bin.cjs",
+  "module": "./dist/bin.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/bin.js",
+    "require": "./dist/bin.cjs"
+  },
   "scripts": {
-    "start": "./Taskfile.sh start",
-    "test": "./Taskfile.sh test"
+    "test": "./Taskfile.sh test",
+    "prepublishOnly": "./Taskfile.sh build"
   },
   "dependencies": {
     "cross-spawn": "^7.0.3",
@@ -34,17 +43,18 @@
     "sade": "^1.8.1"
   },
   "devDependencies": {
-    "@jvdx/core": "^3.6.0"
+    "@jvdx/eslint-config": "^4.3.0",
+    "@jvdx/prettier-config": "^0.3.4",
+    "@types/cross-spawn": "^6.0.6",
+    "@types/node": "^20.14.5",
+    "prettier": "^3.3.2",
+    "typescript": "^5.4.5",
+    "vite": "^5.3.1",
+    "vite-plugin-dts": "^3.9.1",
+    "vitest": "^1.6.0"
   },
   "prettier": "@jvdx/prettier-config",
   "prettierIgnore": [
-    "tests/",
-    "dist/"
-  ],
-  "eslintConfig": {
-    "extends": "@jvdx/eslint-config"
-  },
-  "eslintIgnore": [
     "tests/",
     "dist/"
   ]

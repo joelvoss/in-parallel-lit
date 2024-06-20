@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest';
 import { removeFromArr } from '../../src/lib/remove-from-arr';
 
 describe(`removeFromArr`, () => {
@@ -6,7 +7,7 @@ describe(`removeFromArr`, () => {
 		removeFromArr(arr, 2);
 		expect(arr).toEqual(['a', 'c']);
 	});
-	
+
 	test('item not found', () => {
 		const arr = ['a', 2, 'c'];
 		removeFromArr(arr, 'not-found');

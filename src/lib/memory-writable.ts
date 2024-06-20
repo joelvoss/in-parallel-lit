@@ -3,24 +3,19 @@ import { StringDecoder } from 'node:string_decoder';
 
 const noop = () => {};
 
-/**
- * Writable stream that can hold written chunks.
- */
 export class MemoryWritable extends Writable {
-	queue = [];
-	data = [];
+	queue: Buffer[] = [];
+	data: (Buffer | string | null)[];
 
-	constructor(data = null) {
+	constructor(data: Buffer | string | null = null) {
 		super();
 
-		// NOTE(joel): Ensure `data` is an array.
 		this.data = Array.isArray(data) ? data : [data];
 
 		this.queue = [];
 		for (let chunk of this.data) {
 			if (chunk == null) continue;
 
-			// NOTE(joel): Ensure each chunk is a Buffer.
 			if (!(chunk instanceof Buffer)) {
 				chunk = Buffer.from(chunk);
 			}
@@ -28,16 +23,23 @@ export class MemoryWritable extends Writable {
 		}
 	}
 
-	_write(chunk, enc, cb = noop) {
-		let decoder = null;
+	_write(
+		chunk: string | Buffer,
+		enc: string | null,
+		cb: (error?: Error | null) => void = noop,
+	) {
+		let decoder: StringDecoder | null = null;
 		try {
+			// @ts-expect-error - We catch any StringDecoder errors
 			decoder = enc && enc !== 'buffer' ? new StringDecoder(enc) : null;
 		} catch (err) {
-			return cb(err);
+			return cb(err as Error);
 		}
 
 		let decodedChunk = decoder != null ? decoder.write(chunk) : chunk;
-		this.queue.push(decodedChunk);
+		this.queue.push(
+			Buffer.isBuffer(decodedChunk) ? decodedChunk : Buffer.from(decodedChunk),
+		);
 		cb();
 	}
 
@@ -52,7 +54,7 @@ export class MemoryWritable extends Writable {
 	toString() {
 		let str = '';
 		for (const chunk of this.queue) {
-			str += chunk;
+			str += chunk.toString();
 		}
 		return str;
 	}

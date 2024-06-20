@@ -1,4 +1,4 @@
-import crossSpawn from 'cross-spawn';
+import { describe, test, expect, vi } from 'vitest';
 import { EventEmitter } from 'node:events';
 import { Readable } from 'node:stream';
 
@@ -6,21 +6,29 @@ import { killPids } from '../../src/lib/kill-pids';
 
 ////////////////////////////////////////////////////////////////////////////////
 
-jest.mock('cross-spawn');
+const crossSpawnMock = vi.hoisted(() => {
+	return { spawn: vi.fn() };
+});
+
+vi.mock('cross-spawn', () => {
+	return { spawn: crossSpawnMock.spawn };
+});
 
 ////////////////////////////////////////////////////////////////////////////////
 
 describe(`killPids`, () => {
 	test('default (*nix)', async () => {
-		let toBeKilledPids = [];
+		let toBeKilledPids: number[] = [];
 
-		const killSpy = jest.spyOn(process, 'kill');
+		const killSpy = vi.spyOn(process, 'kill');
 		killSpy.mockImplementation(pid => {
 			toBeKilledPids.push(pid);
+			return true;
 		});
 
-		crossSpawn.mockImplementation(cmd => {
+		crossSpawnMock.spawn.mockImplementation(() => {
 			const mockChildProcess = new EventEmitter();
+			// @ts-expect-error - Mocking `stdout` and `stderr` properties
 			mockChildProcess.stdout = new Readable({
 				read() {
 					this.push(
@@ -35,10 +43,13 @@ describe(`killPids`, () => {
 					this.push(null);
 				},
 			});
+
+			// @ts-expect-error - Mocking `stdout` and `stderr` properties
 			mockChildProcess.stdout.once('end', () => {
 				mockChildProcess.emit('close', 0);
 			});
 
+			// @ts-expect-error - Mocking `stdout` and `stderr` properties
 			mockChildProcess.stderr = new Readable({
 				read() {
 					this.push(null);
@@ -54,13 +65,14 @@ describe(`killPids`, () => {
 	});
 
 	test('default (win)', async () => {
-		let args = [];
-		crossSpawn.mockImplementation((..._args) => {
+		let args: unknown[] = [];
+
+		crossSpawnMock.spawn.mockImplementation((..._args) => {
 			args = _args;
 		});
 
 		await killPids(430, 'win32');
 
-		expect(args).toEqual(['taskkill', ['/F', '/T', '/PID', 430]]);
+		expect(args).toEqual(['taskkill', ['/F', '/T', '/PID', '430']]);
 	});
 });

@@ -1,38 +1,44 @@
-import { prog } from '../src/index';
+import { describe, test, expect, beforeEach, vi } from 'vitest';
 import path from 'node:path';
+import { prog } from '../src/index';
 
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
  * getMockCalls normalizes all `processSpy.mock.calls` and removes any
  * ANSI color codes, since we're not interested in those here.
- * See `select-color.test.js` as well as `wrap-stream-with-label.test.js` for
+ * See `select-color.test.ts` as well as `wrap-stream-with-label.test.ts` for
  * unit tests that should assert ANSI color codes.
  */
-function getStdoutMockCalls(calls) {
+function getStdoutMockCalls<T>(calls: T[]) {
 	return calls.map(call => {
 		const str = call[0].toString();
 		return str.replace(
+			// eslint-disable-next-line no-control-regex
 			/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
 			'',
 		);
 	});
 }
 
+function noop() {
+	return true;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 describe('prog', () => {
-	jest.setTimeout(10000);
-
 	beforeEach(() => {
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 		process.stdout.setMaxListeners(0);
 		process.stderr.setMaxListeners(0);
 		process.stdin.setMaxListeners(0);
 	});
 
 	test('default', async () => {
-		const processSpy = jest.spyOn(process.stdout, 'write').mockImplementation();
+		const processSpy = vi
+			.spyOn(process.stdout, 'write')
+			.mockImplementation(noop);
 		const cmdPath = path.resolve(__dirname, '../tests/__fixture__/mock-cmd.js');
 
 		const cmd1Times = 5;
@@ -64,7 +70,9 @@ describe('prog', () => {
 	});
 
 	test('abort if one process errors out', async () => {
-		const processSpy = jest.spyOn(process.stdout, 'write').mockImplementation();
+		const processSpy = vi
+			.spyOn(process.stdout, 'write')
+			.mockImplementation(noop);
 		const cmdPath = path.resolve(__dirname, '../tests/__fixture__/mock-cmd.js');
 
 		const cmd1Times = 5;
@@ -93,9 +101,9 @@ describe('prog', () => {
 
 	describe('options', () => {
 		test('aggregate output', async () => {
-			const processSpy = jest
+			const processSpy = vi
 				.spyOn(process.stdout, 'write')
-				.mockImplementation();
+				.mockImplementation(noop);
 			const cmdPath = path.resolve(
 				__dirname,
 				'../tests/__fixture__/mock-cmd.js',
@@ -128,9 +136,9 @@ describe('prog', () => {
 		});
 
 		test('max-parallel', async () => {
-			const processSpy = jest
+			const processSpy = vi
 				.spyOn(process.stdout, 'write')
-				.mockImplementation();
+				.mockImplementation(noop);
 			const cmdPath = path.resolve(
 				__dirname,
 				'../tests/__fixture__/mock-cmd.js',
@@ -164,9 +172,9 @@ describe('prog', () => {
 		});
 
 		test('continue-on-error', async () => {
-			const processSpy = jest
+			const processSpy = vi
 				.spyOn(process.stdout, 'write')
-				.mockImplementation();
+				.mockImplementation(noop);
 			const cmdPath = path.resolve(
 				__dirname,
 				'../tests/__fixture__/mock-cmd.js',
@@ -200,9 +208,9 @@ describe('prog', () => {
 		});
 
 		test('names', async () => {
-			const processSpy = jest
+			const processSpy = vi
 				.spyOn(process.stdout, 'write')
-				.mockImplementation();
+				.mockImplementation(noop);
 			const cmdPath = path.resolve(
 				__dirname,
 				'../tests/__fixture__/mock-cmd.js',
