@@ -1,6 +1,6 @@
+import type { SpawnOptions } from 'node:child_process';
 import { spawn as cSpawn } from 'cross-spawn';
 import { killPids } from './kill-pids';
-import type { SpawnOptions } from 'child_process';
 
 /**
  * Launches a new process with the given command.

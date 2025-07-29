@@ -1,5 +1,5 @@
-import { describe, test, expect, beforeEach, vi } from 'vitest';
 import path from 'node:path';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { prog } from '../src/index';
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -14,7 +14,7 @@ function getStdoutMockCalls<T>(calls: T[]) {
 	return calls.map(call => {
 		const str = call[0].toString();
 		return str.replace(
-			// eslint-disable-next-line no-control-regex
+			// biome-ignore lint/suspicious/noControlCharactersInRegex: .
 			/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
 			'',
 		);

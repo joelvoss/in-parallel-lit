@@ -38,24 +38,17 @@
     "prepublishOnly": "./Taskfile.sh build"
   },
   "dependencies": {
-    "cross-spawn": "^7.0.3",
-    "mri": "^1.2.0",
-    "sade": "^1.8.1"
+    "cross-spawn": "7.0.6",
+    "mri": "1.2.0",
+    "sade": "1.8.1"
   },
   "devDependencies": {
-    "@jvdx/eslint-config": "^4.3.0",
-    "@jvdx/prettier-config": "^0.3.4",
-    "@types/cross-spawn": "^6.0.6",
-    "@types/node": "^20.14.5",
-    "prettier": "^3.3.2",
-    "typescript": "^5.4.5",
-    "vite": "^5.3.1",
-    "vite-plugin-dts": "^3.9.1",
-    "vitest": "^1.6.0"
-  },
-  "prettier": "@jvdx/prettier-config",
-  "prettierIgnore": [
-    "tests/",
-    "dist/"
-  ]
+    "@biomejs/biome": "2.1.2",
+    "@types/cross-spawn": "6.0.6",
+    "@types/node": "24.1.0",
+    "typescript": "5.8.3",
+    "vite": "7.0.6",
+    "vite-plugin-dts": "4.5.4",
+    "vitest": "3.2.4"
+  }
 }

@@ -1,6 +1,6 @@
-import { describe, test, expect } from 'vitest';
-import { PrefixTransform } from '../../src/lib/prefix-transform';
 import { PassThrough } from 'node:stream';
+import { describe, expect, test } from 'vitest';
+import { PrefixTransform } from '../../src/lib/prefix-transform';
 
 describe(`PrefixTransform`, () => {
 	test('default', () =>

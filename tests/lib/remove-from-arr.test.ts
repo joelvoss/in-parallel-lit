@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { removeFromArr } from '../../src/lib/remove-from-arr';
 
 describe(`removeFromArr`, () => {

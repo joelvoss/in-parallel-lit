@@ -1,7 +1,7 @@
-let FORCE_COLOR;
-let NODE_DISABLE_COLORS;
-let NO_COLOR;
-let TERM;
+let FORCE_COLOR: string | undefined;
+let NODE_DISABLE_COLORS: string | undefined;
+let NO_COLOR: string | undefined;
+let TERM: string | undefined;
 let isTTY = true;
 let enabled: boolean;
 
@@ -14,7 +14,7 @@ function checkColorSupport() {
 	if (enabled != null) return;
 
 	({ FORCE_COLOR, NODE_DISABLE_COLORS, NO_COLOR, TERM } = process.env);
-	isTTY = process.stdout && process.stdout.isTTY;
+	isTTY = process.stdout?.isTTY;
 
 	enabled =
 		!NODE_DISABLE_COLORS &&
@@ -39,7 +39,7 @@ function createColor(x: number, y: number) {
 		if (!enabled) return txt;
 		return (
 			open +
-			(~('' + txt).indexOf(close) ? txt.replace(rgx, close + open) : txt) +
+			(~`${txt}`.indexOf(close) ? txt.replace(rgx, close + open) : txt) +
 			close
 		);
 	};

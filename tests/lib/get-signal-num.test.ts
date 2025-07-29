@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { getSignalNumber } from '../../src/lib/get-signal-num';
 
 describe(`getSignalNumber`, () => {

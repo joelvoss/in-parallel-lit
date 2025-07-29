@@ -1,6 +1,6 @@
-import { describe, test, expect, vi } from 'vitest';
 import { EventEmitter } from 'node:events';
 import { Readable } from 'node:stream';
+import { describe, expect, test, vi } from 'vitest';
 
 import { killPids } from '../../src/lib/kill-pids';
 

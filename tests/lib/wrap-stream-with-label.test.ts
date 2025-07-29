@@ -1,5 +1,5 @@
-import { describe, test, expect, vi, afterEach, beforeEach } from 'vitest';
 import { PassThrough } from 'node:stream';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { wrapStreamWithLabel } from '../../src/lib/wrap-stream-with-label';
 
 describe(`wrapStreamWithLabel`, () => {

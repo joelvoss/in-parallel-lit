@@ -1,6 +1,6 @@
-import { selectColor } from './select-color';
+import type { Writable } from 'node:stream';
 import { PrefixTransform } from './prefix-transform';
-import type { Writable } from 'stream';
+import { selectColor } from './select-color';
 
 /**
  * Wraps stdout/stderr with a transform stream to add the task name as prefix.

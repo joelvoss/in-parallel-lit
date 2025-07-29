@@ -1,5 +1,5 @@
+import type { stderr, stdin, stdout } from 'node:process';
 import type { Readable, Writable } from 'node:stream';
-import { stdin, stdout, stderr } from 'node:process';
 
 /**
  * Converts a given stream to an option for `child_process.spawn`.

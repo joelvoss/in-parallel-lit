@@ -1,6 +1,6 @@
+import type { SpawnOptions } from 'node:child_process';
 import os from 'node:os';
 import { spawn } from 'cross-spawn';
-import type { SpawnOptions } from 'node:child_process';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -110,7 +110,7 @@ export async function killPids(pid: number, platform = process.platform) {
 		for (const pid of pids) {
 			process.kill(pid);
 		}
-	} catch (err) {
+	} catch (_) {
 		/* Silence is golden */
 	}
 }
