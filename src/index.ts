@@ -1,5 +1,6 @@
 import type { ChildProcess } from 'node:child_process';
 import type { Readable, Writable } from 'node:stream';
+
 import { getSignalNumber } from './lib/get-signal-num';
 import { getStreamKind } from './lib/get-stream-kind';
 import { InParallelError } from './lib/in-parallel-error';
@@ -17,6 +18,12 @@ interface Options {
 	'max-parallel'?: number;
 }
 
+interface ProcessLike {
+	stdin: Readable;
+	stdout: Writable;
+	stderr: Writable;
+}
+
 interface Result {
 	name: string;
 	code?: number | null;
@@ -30,11 +37,11 @@ interface QueueItem {
 /**
  * prog represents the main program logic.
  */
-export function prog(opts: Options, proc: NodeJS.Process) {
+export function prog(opts: Options, proc: ProcessLike) {
 	const { _: tasks, ...options } = opts;
 
 	const customTaskNames =
-		options.names != null ? options.names.split(',').map(n => n.trim()) : [];
+		options.names != null ? options.names.split(',').map((n) => n.trim()) : [];
 
 	return new Promise((resolve, reject) => {
 		let results: Result[] = [];
@@ -94,16 +101,14 @@ export function prog(opts: Options, proc: NodeJS.Process) {
 			if (options['aggregate-output']) {
 				// NOTE(joel): Replace the stdout stream with a memory stream.
 				// TypeScript doesn't like this, but it's fine.
-				optionsClone.stdout = writer as unknown as NodeJS.WriteStream & {
-					fd: 1;
-				};
+				optionsClone.stdout = writer as unknown as Writable;
 			}
 
 			const promise = runTask(task.name, optionsClone);
 
 			promises.push(promise);
 			promise.then(
-				result => {
+				(result) => {
 					removeFromArr(promises, promise);
 
 					if (aborted) return;
@@ -134,7 +139,7 @@ export function prog(opts: Options, proc: NodeJS.Process) {
 
 					next();
 				},
-				err => {
+				(err) => {
 					removeFromArr(promises, promise);
 					if (!options['continue-on-error']) {
 						error = err;
@@ -213,7 +218,7 @@ function runTask(name: string, opts: RunTaskOptions) {
 		}
 
 		// Register
-		proc.on('error', err => {
+		proc.on('error', (err) => {
 			proc = null;
 			return reject(err);
 		});

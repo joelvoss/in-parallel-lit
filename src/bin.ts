@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
 import { createRequire } from 'node:module';
+
 import sade from 'sade';
+
 import { prog } from './index';
 
 async function run(argv: string[]) {
@@ -35,7 +37,7 @@ async function run(argv: string[]) {
 			`Avoid interleaving output by delaying printing of each command's output until it has finished.`,
 			false,
 		)
-		.action(opts => prog(opts, process))
+		.action((opts) => prog(opts, process))
 		.parse(argv);
 }
 

@@ -1,4 +1,5 @@
 import type { Writable } from 'node:stream';
+
 import { PrefixTransform } from './prefix-transform';
 import { selectColor } from './select-color';
 

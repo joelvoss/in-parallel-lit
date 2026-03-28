@@ -1,5 +1,7 @@
 import type { SpawnOptions } from 'node:child_process';
+
 import { spawn as cSpawn } from 'cross-spawn';
+
 import { killPids } from './kill-pids';
 
 /**

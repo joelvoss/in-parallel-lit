@@ -1,5 +1,7 @@
 import { PassThrough } from 'node:stream';
+
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+
 import { wrapStreamWithLabel } from '../../src/lib/wrap-stream-with-label';
 
 describe(`wrapStreamWithLabel`, () => {
@@ -23,7 +25,7 @@ describe(`wrapStreamWithLabel`, () => {
 			if (target == null) return rej();
 
 			let chunks: unknown[] = [];
-			target.on('data', chunk => chunks.push(chunk));
+			target.on('data', (chunk) => chunks.push(chunk));
 			target.on('end', () => {
 				expect(chunks).toMatchInlineSnapshot(`
 			[
@@ -80,7 +82,7 @@ describe(`wrapStreamWithLabel`, () => {
 			if (target == null) return rej();
 
 			let chunks: unknown[] = [];
-			target.on('data', chunk => chunks.push(chunk));
+			target.on('data', (chunk) => chunks.push(chunk));
 			target.on('end', () => {
 				expect(chunks).toMatchInlineSnapshot(`
 			[

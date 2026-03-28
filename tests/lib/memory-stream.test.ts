@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest';
+
 import { MemoryWritable } from '../../src/lib/memory-writable';
 
 describe(`MemoryWritable`, () => {
@@ -17,7 +18,7 @@ describe(`MemoryWritable`, () => {
 	const testData = 'abcdefghijklmnopqrstuvwxyz';
 
 	test('write data writable stream', () =>
-		new Promise(done => {
+		new Promise((done) => {
 			const memStream = new MemoryWritable();
 
 			writeToStream(memStream, testData.split(''));
@@ -29,7 +30,7 @@ describe(`MemoryWritable`, () => {
 		}));
 
 	test('toBuffer', () =>
-		new Promise(done => {
+		new Promise((done) => {
 			const memStream = new MemoryWritable();
 
 			writeToStream(memStream, testData.split(''));
@@ -47,7 +48,7 @@ describe(`MemoryWritable`, () => {
 		}));
 
 	test('toBuffer - all data in one buffer', () =>
-		new Promise(done => {
+		new Promise((done) => {
 			const memStream = new MemoryWritable();
 
 			let arrTestData: Buffer[] = [];

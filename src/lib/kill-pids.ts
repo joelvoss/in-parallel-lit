@@ -1,5 +1,6 @@
 import type { SpawnOptions } from 'node:child_process';
 import os from 'node:os';
+
 import { spawn } from 'cross-spawn';
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -22,17 +23,17 @@ function crossSpawnPromise(
 			return reject('stdout/stderr is null');
 		}
 
-		ch.stdout.on('data', d => {
+		ch.stdout.on('data', (d) => {
 			stdout += d.toString();
 		});
 
-		ch.stderr.on('data', d => {
+		ch.stderr.on('data', (d) => {
 			stderr += d.toString();
 		});
 
-		ch.on('error', err => reject(err));
+		ch.on('error', (err) => reject(err));
 
-		ch.on('close', code => {
+		ch.on('close', (code) => {
 			if (stderr) return reject(stderr);
 			if (code !== 0) return reject(`${cmd} exited with code ${code}`);
 			return resolve(stdout);
@@ -58,8 +59,8 @@ export async function killPids(pid: number, platform = process.platform) {
 		//    430   432
 		//      1   727
 		//      1  7166
-		let stdout = await crossSpawnPromise('ps', ['-A', '-o', 'ppid,pid']);
-		let stdoutRows = stdout.split(os.EOL);
+		const stdout = await crossSpawnPromise('ps', ['-A', '-o', 'ppid,pid']);
+		const stdoutRows = stdout.split(os.EOL);
 
 		let pidExists = false;
 		const pidTree: Record<number, number[]> = {};
@@ -67,9 +68,9 @@ export async function killPids(pid: number, platform = process.platform) {
 			stdoutRows[i] = stdoutRows[i].trim();
 			if (!stdoutRows[i]) continue;
 
-			let stdoutTuple = stdoutRows[i].split(/\s+/);
-			let stdoutPpid = parseInt(stdoutTuple[0], 10);
-			let stdoutPid = parseInt(stdoutTuple[1], 10);
+			const stdoutTuple = stdoutRows[i].split(/\s+/);
+			const stdoutPpid = parseInt(stdoutTuple[0], 10);
+			const stdoutPid = parseInt(stdoutTuple[1], 10);
 
 			// NOTE(joel): Make sure our pid is part of the `ps` output.
 			if (
@@ -96,7 +97,7 @@ export async function killPids(pid: number, platform = process.platform) {
 		let idx = 0;
 		const pids = [pid];
 		while (idx < pids.length) {
-			let curpid = pids[idx++];
+			const curpid = pids[idx++];
 			if (!pidTree[curpid]) continue;
 
 			for (let j = 0; j < pidTree[curpid].length; j++) {
@@ -110,7 +111,7 @@ export async function killPids(pid: number, platform = process.platform) {
 		for (const pid of pids) {
 			process.kill(pid);
 		}
-	} catch (_) {
+	} catch {
 		/* Silence is golden */
 	}
 }

@@ -1,5 +1,6 @@
 import { EventEmitter } from 'node:events';
 import { Readable } from 'node:stream';
+
 import { describe, expect, test, vi } from 'vitest';
 
 import { killPids } from '../../src/lib/kill-pids';
@@ -21,7 +22,7 @@ describe(`killPids`, () => {
 		let toBeKilledPids: number[] = [];
 
 		const killSpy = vi.spyOn(process, 'kill');
-		killSpy.mockImplementation(pid => {
+		killSpy.mockImplementation((pid) => {
 			toBeKilledPids.push(pid);
 			return true;
 		});

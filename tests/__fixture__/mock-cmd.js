@@ -10,7 +10,7 @@ async function main() {
 	const delay = Boolean(process.argv[4]) || false;
 
 	if (delay) {
-		await new Promise(r => setTimeout(r, 100));
+		await new Promise((r) => setTimeout(r, 100));
 	}
 
 	if (cmd.startsWith('repeat')) {
@@ -18,7 +18,7 @@ async function main() {
 
 		for (let i = 0; i < times; i++) {
 			console.log(`${prefix} - repeat ${i} times`);
-			await new Promise(r => setTimeout(r, 300));
+			await new Promise((r) => setTimeout(r, 300));
 		}
 	}
 
@@ -33,7 +33,7 @@ async function main() {
 			}
 
 			console.log(`${prefix} - repeat ${i} times`);
-			await new Promise(r => setTimeout(r, 300));
+			await new Promise((r) => setTimeout(r, 300));
 		}
 	}
 }

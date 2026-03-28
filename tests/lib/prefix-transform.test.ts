@@ -1,10 +1,12 @@
 import { PassThrough } from 'node:stream';
+
 import { describe, expect, test } from 'vitest';
+
 import { PrefixTransform } from '../../src/lib/prefix-transform';
 
 describe(`PrefixTransform`, () => {
 	test('default', () =>
-		new Promise(done => {
+		new Promise((done) => {
 			expect.assertions(1);
 
 			const prefix = '[my test prefix] ';
@@ -15,7 +17,7 @@ describe(`PrefixTransform`, () => {
 			target.pipe(stream);
 
 			let chunks: unknown[] = [];
-			target.on('data', chunk => chunks.push(chunk));
+			target.on('data', (chunk) => chunks.push(chunk));
 			target.on('end', () => {
 				expect(chunks.toString()).toBe(`${prefix}${message}`);
 				done(0);

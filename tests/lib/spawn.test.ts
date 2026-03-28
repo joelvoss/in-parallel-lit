@@ -1,6 +1,8 @@
 import { EventEmitter } from 'node:events';
 import { Readable } from 'node:stream';
+
 import { describe, expect, test, vi } from 'vitest';
+
 import { spawn } from '../../src/lib/spawn';
 
 ////////////////////////////////////////////////////////////////////////////////

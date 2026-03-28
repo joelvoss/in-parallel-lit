@@ -1,5 +1,7 @@
 import path from 'node:path';
+
 import { beforeEach, describe, expect, test, vi } from 'vitest';
+
 import { prog } from '../src/index';
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -11,10 +13,10 @@ import { prog } from '../src/index';
  * unit tests that should assert ANSI color codes.
  */
 function getStdoutMockCalls<T>(calls: T[]) {
-	return calls.map(call => {
+	return calls.map((call) => {
 		const str = call[0].toString();
 		return str.replace(
-			// biome-ignore lint/suspicious/noControlCharactersInRegex: .
+			// oxlint-disable-next-line no-control-regex
 			/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
 			'',
 		);

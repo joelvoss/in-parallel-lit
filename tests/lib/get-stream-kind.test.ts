@@ -1,5 +1,7 @@
 import { Writable } from 'node:stream';
+
 import { describe, expect, test } from 'vitest';
+
 import { getStreamKind } from '../../src/lib/get-stream-kind';
 
 describe(`getStreamKind`, () => {
